@@ -1,0 +1,39 @@
+#Splines: Need 1s to be 1:end
+#Function
+f=c()
+splinecount=function(a, cut){
+  for (i in 1:length(a)){
+    f[i]=ifelse(a[i]>=cut,as.numeric(a[i])-(cut-1),0)
+  }
+  return(f)
+}
+#Cutoffs
+cuts <- as.numeric(as.Date(c("2016-02-01", "2016-02-09", "2016-02-20", "2016-02-23", "2016-02-27",
+                             "2016-03-02", "2016-04-15", "2016-05-03", "2016-06-06",
+                             "2016-07-15", "2016-06-16", "2016-07-12", "2016-07-14",
+                             "2016-07-18", "2016-07-25", "2016-09-26", "2016-10-04",
+                             "2016-10-07", "2016-10-09", "2016-10-15", "2016-10-19")))
+
+#Make Splines
+sdays=splinecount(a=dates, cut=16688)
+iowa=splinecount(a=dates, cut=cuts[1])
+NH=splinecount(a=dates, cut=cuts[2])
+SCR_NevD=splinecount(a=dates, cut=cuts[3])
+NevR=splinecount(a=dates, cut=cuts[4])
+SCD=splinecount(a=dates, cut=cuts[5])
+SupT=splinecount(a=dates, cut=cuts[6])
+FEC1=splinecount(a=dates, cut=cuts[7])
+Trump=splinecount(a=dates, cut=cuts[8])
+Clinton=splinecount(a=dates, cut=cuts[9])
+FEC2=splinecount(a=dates, cut=cuts[10])
+Sand=splinecount(a=dates, cut=cuts[11])
+SandE=splinecount(a=dates, cut=cuts[12])
+Pence=splinecount(a=dates, cut=cuts[13])
+RNC=splinecount(a=dates, cut=cuts[14])
+DNC=splinecount(a=dates, cut=cuts[15])
+Deb1=splinecount(a=dates, cut=cuts[16])
+VPDeb=splinecount(a=dates, cut=cuts[17])
+AH=splinecount(a=dates, cut=cuts[18])
+Deb2=splinecount(a=dates, cut=cuts[19])
+FEC3=splinecount(a=dates, cut=cuts[20])
+Deb3=splinecount(a=dates, cut=cuts[21])
