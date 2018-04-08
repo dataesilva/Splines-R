@@ -1,3 +1,43 @@
+#Packages
+library("readr")
+library("dplyr")
+library("lme4")
+library("arm")
+library("optimx")
+library("sjstats")
+
+#OPTION 1
+fb <- read_csv("data.csv")
+fb$lean <- as.factor(fb$lean)
+fb$media_type <- as.factor(fb$media_type)
+fb$log <- log(fb$num_reactions)
+fb1 <- select(fb, c(lean, media_type, log, days, page))
+fb <- fb1
+rm(fb1)
+
+fb$days <- fb$days #Lead to RNC start
+fb$Cp <- ifelse(fb$days > 2,fb$days-2,0) #Lag during RNC
+fb$Wl <- ifelse(fb$days > 4,fb$days-4,0) #Lead to Wikileaks
+fb$Wp <- ifelse(fb$days > 7,fb$days-7,0) #Post Wikileaks
+fb$Cd <- ifelse(fb$days > 9,fb$days-9,0) #Lead DNC ending
+fb$S <- ifelse(fb$days > 12,fb$days-12,0) #Summer
+fb$D1l <- ifelse(fb$days > 70,fb$days-70,0) #Lead Debate 1
+fb$D1p <- ifelse(fb$days > 72,fb$days-72,0) #Post Debate 1
+fb$B1 <- ifelse(fb$days > 74,fb$days-74,0) #Break 1
+fb$AHl <- ifelse(fb$days > 81,fb$days-81,0) #Lead Access Hollywood
+fb$AHp <- ifelse(fb$days > 83,fb$days-83,0) #Post Access Hollywood/Lead Debate 2
+fb$D2l <- ifelse(fb$days > 85,fb$days-85,0) #Post Debate 2
+fb$B2 <- ifelse(fb$days > 88,fb$days-88,0) #Break 2
+fb$Al <- ifelse(fb$days > 90,fb$days-90,0) #Lead Assault Claims
+fb$Ap <- ifelse(fb$days > 92,fb$days-92,0) #Post Assault Claims/Lead Debate 3
+fb$D3p <- ifelse(fb$days > 95,fb$days-95,0) # Post Debate 3
+fb$B3 <- ifelse(fb$days > 97,fb$days-97,0) #Break 3
+fb$COl <- ifelse(fb$days > 103,fb$days-103,0) #Lead Comey
+fb$COp <- ifelse(fb$days > 105,fb$days-105,0) #Post Comey
+fb$B4 <- ifelse(fb$days > 107,fb$days-107,0) #Break 4
+fb$El <- ifelse(fb$days > 115,fb$days-115,0) #Lead Election Day
+
+#OPTION2
 #Splines: Need 1s to be 1:end
 #Function
 f=c()
