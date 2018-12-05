@@ -1,0 +1,114 @@
+#Packages
+library("readr")
+library("dplyr")
+library("lme4")
+library("arm")
+library("optimx")
+library("sjstats")
+#Setting up data
+fb <- read_csv("H:/Dropbox/WSU/Research/Spline/fb.csv")
+fb$lean <- as.factor(fb$lean)
+fb$media_type <- as.factor(fb$media_type)
+fb$log <- log(fb$num_reactions)
+
+#Empty model
+m.empty <- lmer(log ~ 1 + (1|page), fb)
+display(m.empty)
+coef(m.empty)
+summary(m.empty)
+plot(m.empty)
+#Model with Days
+m.days <- lmer(log ~ days + (1|page), fb)
+display(m.days)
+coef(m.days)
+summary(m.days)
+plot(m.days)
+
+#Formal Events Models 1-4
+#FE1
+m.events <- lmer(log ~ days + RNCsp + HRCNOMsp + DEB1sp + DEB2sp + DEB3sp + (1|page), fb)
+display(m.events)
+coef(m.events)
+summary(m.events)
+plot(m.events)
+#FE2
+m.lvl2 <- lmer(log ~ lean + media_type + (1|page), fb)
+display(m.lvl2)
+coef(m.lvl2)
+summary(m.lvl2)
+plot(m.lvl2)
+#FE3
+m.events.pl.mt <- lmer(log ~ days + RNCsp + HRCNOMsp + DEB1sp + DEB2sp + DEB3sp + lean + media_type + (1|page), fb)
+display(m.events.pl.mt)
+coef(m.events.pl.mt)
+summary(m.events.pl.mt)
+plot(m.events.pl.mt)
+#FE4
+m.events.cr <- lmer(log ~ days + RNCsp + HRCNOMsp + DEB1sp + DEB2sp + DEB3sp + lean + media_type +  days:lean + RNCsp:lean + HRCNOMsp:lean + DEB1sp:lean + DEB2sp:lean + DEB3sp:lean +
+                      days:media_type + RNCsp:media_type + HRCNOMsp:media_type + DEB1sp:media_type + DEB2sp:media_type + DEB3sp:media_type +
+                      (days + RNCsp + HRCNOMsp + DEB1sp + DEB2sp + DEB3sp|page), fb,
+                    control=lmerControl(optCtrl=list(maxfun=80000, calc.derivs = FALSE)))
+display(m.events.cr)
+coef(m.events.cr)
+summary(m.events.cr)
+plot(m.events.cr)
+
+#Campaign Scandals Models 1-5
+#CS1
+m.scan <- lmer(log ~ days + WIKIsp + AHOLLYsp + ASSAULTsp + COMEYsp + (1|page), fb)
+display(m.scan)
+coef(m.scan)
+summary(m.scan)
+plot(m.scan)
+#CS2
+m.lvl2 <- lmer(log ~ lean + media_type + (1|page), fb)
+display(m.lvl2)
+coef(m.lvl2)
+summary(m.lvl2)
+plot(m.lvl2)
+#CS3
+m.scan.pl.mt <- lmer(log ~ days + WIKIsp + AHOLLYsp + ASSAULTsp + COMEYsp + lean + media_type + (1|page), fb)
+display(m.scan.pl.mt)
+coef(m.scan.pl.mt)
+summary(m.scan.pl.mt)
+plot(m.scan.pl.mt)
+#CS4
+m.scan.cr <- lmer(log ~ days + WIKIsp + AHOLLYsp + ASSAULTsp + COMEYsp + lean + media_type+  days:lean + WIKIsp:lean + AHOLLYsp:lean + ASSAULTsp:lean + COMEYsp:lean
+                  + days:media_type + WIKIsp:media_type + AHOLLYsp:media_type + ASSAULTsp:media_type + COMEYsp:media_type
+                  + (days + WIKIsp + AHOLLYsp + ASSAULTsp + COMEYsp|page), fb
+                 , control=lmerControl(optCtrl=list(maxfun=80000, calc.derivs = FALSE)))
+display(m.scan.cr)
+coef(m.scan.cr)
+summary(m.scan.cr)
+plot(m.scan.cr)
+
+#Pseudo R-squared
+
+
+#Plots
+library(RColorBrewer)
+library(ggplot2)
+plot.m.scan.r <- data.frame(m.scan.r@frame, fitted.re = fitted(m.scan.r))
+myColors <- brewer.pal(8,"Set1")
+names(myColors) <- levels(m.scan.r@frame$page)
+colScale <- scale_color_manual(name = "page", values = myColors)
+
+plot.m.scan.r <- data.frame(m.scan.r@frame, fitted.re = fitted(m.scan.r))
+g1.m.scan.r <- ggplot(plot.m.scan.r, aes(x = days, y = log, colour=page)) + geom_point()
+g2.m.scan.r <- g1.m.scan.r + geom_line(aes(y = fitted.re), linetype = 1, size = 1.5) + scale_x_continuous(breaks = 0:117)
+g3.m.scan.r <- g2.m.scan.r + geom_text(aes(x=7, label = "Wikileaks\n ", y = 1.5, angle = 90))+geom_text(aes(x=83, label = "AH Tapes\n ", y = 1.5, angle = 90))+
+  geom_text(aes(x=90, label = "SACs 1\n ", y = 1.5, angle = 90)) + geom_text(aes(x=105, label = "Comey\n ", y = 1.5, angle = 90))
+g4.m.scan.r <- g3.m.scan.r + theme_bw()
+print(g4.m.scan.r)
+
+
+
+
+
+plot.m.events.r <- data.frame(m.events.r@frame, fitted.re = fitted(m.events.r))
+g1.m.events.r <- ggplot(plot.m.events.r, aes(x = days, y = log, colour=page)) + geom_point()
+g2.m.events.r <- g1.m.events.r + geom_line(aes(y = fitted.re), linetype = 1, size = 1.5) + scale_x_continuous(breaks = 0:117)
+g3.m.events.r <- g2.m.events.r + geom_text(aes(x=2, label = "Conventions\n ", y = 1.5, angle = 90))+geom_text(aes(x=12, label = "Summer\n ", y = 1.5, angle = 90))+
+  geom_text(aes(x=72, label = "Debate 1\n ", y = 1.5, angle = 90)) + geom_text(aes(x=85, label = "Debate2\n ", y = 1.5, angle = 90)) + geom_text(aes(x=95, label = "Debate3\n ", y = 1.5, angle = 90))
+g4.m.events.r <- g3.m.events.r + theme_bw()
+print(g4.m.events.r)
